@@ -1,0 +1,113 @@
+{% extends 'base_head.html' %}
+
+{% block head %}
+    <script>
+        $(function () {
+
+            {#遍历所有的商品详情订单，计算该订单的总价钱#}
+            $('.cart_list').each(function () {
+
+                count = $(this).find('.col03').html();
+                price = $(this).find('.col04 em').html()
+                total_money = count * price
+                $(this).next().find('em').html(total_money)
+                {#alert(count+"|"+price)#}
+
+            })
+
+            $('.oper_btn').click(function () {
+
+               var oid = $(this).parent().prev().val()
+                alert(oid)
+                {#$.get('/pay_'+oid)#}
+                    window.location='/pay_'+oid
+
+            })
+
+        })
+    </script>
+{% endblock head %}
+
+{% block search%}
+
+	<div class="main_con clearfix">
+		<div class="left_menu_con clearfix">
+			<h3>用户中心</h3>
+			<ul>
+				<li><a href="/info">· 个人信息</a></li>
+				<li><a href="/order_1" class="active">· 全部订单</a></li>
+				<li><a href="/site">· 收货地址</a></li>
+			</ul>
+		</div>
+		<div class="right_content clearfix">
+				<h3 class="common_title2">全部订单</h3>
+
+
+
+                {% for o in page %}
+
+				<ul class="order_list_th w978 clearfix">
+					<li class="col01">{{ o.odate }}</li>
+					<li class="col02">订单号：{{ o.oid }}</li>
+                    {% if o.oIsPay == False %}
+					   <li class="col02 stress">未支付</li>
+                      {% else %}
+                        <li class="col02 stress">已支付</li>
+                    {% endif %}
+				</ul>
+
+
+				<table class="order_list_table w980">
+					<tbody>
+                    {% for order in details %}
+						<tr>
+                        {% for detail in order %}
+                            {% if detail.order.oid == o.oid %}
+                             <td width="55%" class="cart_list">
+
+                                <ul class="order_goods_list clearfix">
+                                    <li class="col01"><img src="/static/{{ detail.goods.gpic }}"></li>
+                                    <li class="col02">{{ detail.goods.gtitle }}<em>11.80元/500g</em></li>
+                                    <li class="col03">{{ detail.count }}</li>
+                                    <li class="col04"><em>11.80</em>元</li>
+                                </ul>
+
+                            </td>
+							<td width="15%"><em>33.60</em>元</td>
+                                {% if detail.order.oIsPay == False %}
+							        <td width="15%">待付款</td>
+                                    {% else %}
+                                    <td width="15%">已付款</td>
+                                {% endif %}
+                                <input type="hidden" value="{{ detail.id }}" class="oid">
+							<td width="15%"><a href="#" class="oper_btn">去付款</a></td>
+						</tr>
+                         {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+					</tbody>
+				</table>
+
+        {% endfor %}
+
+				<div class="pagenation">
+              {% if page.has_previous %}
+                    <a href="/order_{{ page.previous_page_number }}">上一页</a>
+              {% endif %}
+
+              {% for p in paginator.page_range %}
+
+				<a href="/order_{{ p }}">{{ p }}</a>
+
+                {% endfor %}
+
+
+                {% if page.has_next %}
+                    <a href="/order_{{ page.next_page_number }}">下一页></a>
+                {% endif %}
+				</div>
+		</div>
+	</div>
+
+{% endblock search%}
+

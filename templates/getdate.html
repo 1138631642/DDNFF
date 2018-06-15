@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{#{% for type in list %}#}
+{#<li>#}
+{#    {{ type.gtitle }}|#}
+{#    typeid:{{ type.gtype.id }}#}
+{##}
+{#</li>#}
+{#{% endfor %}#}
+{#{{ list.gtitle }}#}
+
+
+{#{% for good in newTwos %}#}
+{#    <li>{{ good.gtype.ttitle }}|{{ good.gtitle }}</li>#}
+{#{% endfor %}#}
+{#<hr>#}
+{#{% for good in goods %}#}
+{#   <li>{{ good.gtype.ttitle }}|{{ good.gtitle }}</li>#}
+{#{% endfor %}#}
+
+
+{#{{ page }}#}
+{#{% for p in page %}#}
+{#{{ p.ptitle }}#}
+{#{%  endfor %}#}
+{#{{ index }}#}
+
+{#{% if request.session.user_name|default:'' != '' %}#}
+{#    <h1>{{ request.session.user_name }}</h1>#}
+{#{% else %}#}
+{#    <h1>没有登入</h1>#}
+{#{% endif %}#}
+{##}
+{##}
+{#{% if request.session.user_name|default:'' != '' %}#}
+{#    <h1>{{ request.session.user_name }}</h1>#}
+{#{% else %}#}
+{#    <h1>没有登入</h1>#}
+{#{% endif %}#}
+{##}
+{#{% if request.session.user_name|default:'' != '' %}#}
+{#    <h1>{{ request.sessio.user_name}}</h1>#}
+{#{% else %}#}
+{#    <h1>没有登入</h1>#}
+{#{% endif %}#}
+{##}
+{#{% for g in list %}#}
+{#    <h1>{{ g }}</h1>#}
+{#{% endfor %}#}
+
+
+{#{{ list }}#}
+
+{#{{ result }}#}
+{##}
+{#{% for cart in carts %}#}
+{#    {{ cart }}#}
+{#{% endfor %}#}
+
+
+{#{% for c in data %}#}
+{#    <h1>{{ c}}</h1>#}
+{##}
+{#{% endfor %}#}
+{#<hr>#}
+{#{{ total }}#}
+{#<hr>#}
+{#{{ order }}#}
+{#<hr>#}
+{#{% for dd in d %}#}
+{#    {{ dd }}#}
+{#{% endfor %}#}
+{#{{ data }}#}
+
+
+{#{{ address }}#}
+
+{#{% for order in orders %}#}
+{#   <h1>{{ order.oid }}</h1>#}
+{##}
+{#    {% for o in details %}#}
+{##}
+{#        {% for d in o %}#}
+{#            {% if d.order.oid == order.oid  %}#}
+{#            <h1>{{ d.id }}|{{ d.price }}|{{ d.goods.gtitle }}|{{ d.order.oIsPay }}</h1>#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{##}
+{#    {% endfor %}#}
+{##}
+{#{% endfor %}#}
+
+
+
+{#{{ a }}#}
+
+
+{{ oid }}
+
+{{ detail.order.oIsPay }}
+{{ detail.id }}
+{{ detail.goods.gtitle }}
+
+</body>
+</html>

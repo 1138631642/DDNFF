@@ -1,0 +1,235 @@
+{% extends 'base_head.html' %}
+
+{% block head %}
+    <script>
+    {#定义一个方法，用来计算购物车中的所有商品的总价格#}
+    function total() {
+            total_money=0
+            $('.col07').each(function () {
+                count = $(this).prev().find('input').val()
+                price = $(this).parent().find('.col03 em ').html()
+                $(this).parent().find('.col07 em').html(count*price)
+
+                total_money += count*price
+
+            })
+            {#总钱数#}
+            $('.settlements .col03 em').html(total_money)
+    }
+
+    $(function () {
+
+            {#在程序加载完后，调用计算所有商品的总价钱的方法#}
+            total()
+            {#alert(total_money)#}
+
+            {#添加商品数量#}
+            $(".add").click(function () {
+
+                {#该商品数量#}
+                num = parseInt($(this).next().val())
+                num = num + 1
+                {#给记录商品的input赋值#}
+                $(this).next().val(num)
+
+                {#该商品的总价钱#}
+                sum_money = parseInt($(this).parent().parent().parent().find('.col07 em').text())
+                price = parseFloat($(this).parent().parent().parent().find('.col03 em').text())
+                sum_money = num * price
+                $(this).parent().parent().parent().find('.col07 em').text(sum_money)
+                {#alert()#}
+                total()
+
+                {#发送请求，将该现在用户更改后的商品数量修改到数据库#}
+                var cid = $(this).prev().val()
+                var count = $(this).next().val()
+                {#alert(cid+'|'+count)#}
+                $.ajax({
+                    type:'get',
+                    url:'/edit_'+cid+'_'+count,
+                    dataType:"json",
+                    success:function(){
+                        return;
+                    },
+                    error:function(){
+                        alert('修改失败')
+                    }
+                })
+            })
+
+            {#减少商品数量#}
+            $('.minus').click(function () {
+                num = parseInt($(this).prev().val())
+                {#alert(num)#}
+                if(num<=1){
+                    num = 1
+                }else {
+                     num = num - 1
+                }
+
+                $(this).prev().val(num)
+
+                sum_money = parseInt($(this).parent().parent().parent().find('.col07 em').text())
+                price = parseFloat($(this).parent().parent().parent().find('.col03 em').text())
+                sum_money = num * price
+                $(this).parent().parent().parent().find('.col07 em').text(sum_money)
+                total()
+
+                {#发送请求，将该现在用户更改后的商品数量修改到数据库#}
+                var cid = $(this).next().val()
+                var count = $(this).prev().val()
+                {#alert(cid+'|'+count)#}
+                $.ajax({
+                    type:'get',
+                    url:'/edit_'+cid+'_'+count,
+                    dataType:"json",
+                    success:function(){
+                        return;
+                    },
+                    error:function(){
+                        alert('修改失败')
+                    }
+                })
+
+            })
+
+            {#删除购物车中的商品#}
+            $('.delete_cart').click(function () {
+                {#var cid = $("#cid").val()#}
+                {#alert(cid)#}
+                var cid = $(this).parent().prev().val()
+                var that = $(this).parent().parent()
+
+
+                $.ajax({
+                    url: '/delete_' + cid,
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (dic) {
+                        {#alert(dic.result)#}
+                        that.remove()
+
+                        {#重新计算购物车中所有商品总价钱#}
+                        total()
+
+                        {#点击删除的时候，同时将购物车中的商品总数量减1#}
+                        count_cart = $('.total_count em').html()
+                        total_carts = $("#total_carts").html()
+
+                        count_cart = parseInt(count_cart) - 1
+                        total_carts = parseInt(total_carts)-1
+
+                        $('.total_count em').html(count_cart)
+                        $("#total_carts").html(total_carts)
+
+                    },
+                    error: function () {
+                        alert('删除失败')
+                    }
+                })
+            })
+
+            {#反选#}
+            $(":checkbox:not(#check_all)").click(function () {
+                 //$('#check_all').prop('checked',false)
+                if($(this).prop('checked')){
+                    if($(':checked').length+1==$(':checkbox').length){
+                        $('#check_all').prop('checked',true);
+                   }
+                }
+                else {
+                    $('#check_all').prop('checked',false)
+                }
+            })
+
+            {#全选#}
+            $('#check_all').click(function () {
+
+                if($(this).prop('checked')){
+                    $(':checkbox').prop('checked',true)
+                    {#alert(1)#}
+                }
+                else  {
+                    {#alert(2)#}
+                    $(':checkbox').prop('checked',false)
+                }
+
+            })
+
+            {#结算#}
+            $('#account').click(function () {
+                {#alert()#}
+                var cids = []
+                $(':checkbox:not("#check_all")').each(function () {
+                    if($(this).prop('checked')){
+
+                        {#将勾上选的商品添加到数组中#}
+                        var n=cids.push(parseInt(($(this).val())))
+                        {#alert($(this).val())#}
+                    }
+
+                })
+
+
+                {#发送ajax请求获取数据#}
+                $.ajax({
+                    type:"get",
+                    url:'/cart_order',
+                    traditional:true,
+                    data:{'cids':cids},
+                    success:function(dic){
+
+                        window.location='/cart_order2'
+                    },
+                    error:function () {
+                        alert('error')
+                   }
+
+                })
+            })
+        })
+    </script>
+{% endblock head %}
+
+{% block search %}
+	<div class="total_count">全部商品<em>{{ carts_len }}</em>件</div>
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+
+    {% for cart in carts %}
+	<ul class="cart_list_td clearfix">
+		<li class="col01"><input type="checkbox" name="" checked value="{{ cart.id }}"></li>
+		<li class="col02"><img src="/static/{{ cart.goods.gpic }}"></li>
+		<li class="col03">{{ cart.goods.gtitle }}<br><em>{{ cart.goods.gprice }}</em>元/{{ cart.goods.gunite }}g</li>
+		<li class="col04">{{ cart.goods.gunite }}g</li>
+		<li class="col05">{{ cart.goods.gprice }}元</li>
+		<li class="col06">
+			<div class="num_add">
+                <input type="hidden" value="{{ cart.id }}" id="cid2">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value="{{ cart.count }}">
+				<a href="javascript:;" class="minus fl">-</a>
+                <input type="hidden" value="{{ cart.id }}" id="cid3">
+			</div>
+		</li>
+		<li class="col07"><em></em>元</li>
+        <input type="hidden" value="{{ cart.id }}" id="cid">
+		<li class="col08"><a href="javascript:;" class="delete_cart">删除</a></li>
+	</ul>
+    {% endfor %}
+
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" id="check_all" checked=""></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b id="total_carts">{{ carts_len }}</b>件商品</li>
+		<li class="col04"><a href="javascript:;"  id='account'>去结算</a></li>
+	</ul>
+
+{% endblock search %}

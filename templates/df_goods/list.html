@@ -1,0 +1,181 @@
+{% extends 'df_goods/base.html' %}
+
+{% block head %}
+    <script src="/static/js/jquery-1.12.4.min.js"></script>
+    <script>
+        $(function () {
+
+            {#在页面一加载的时候，就获取该用户已经在购物车中添加了多少商品#}
+            $.ajax({
+                url:'/cart_count',
+                type:'get',
+                dataType:'json',
+                success:function(dic){
+                    $('.goods_count').html(dic.count)
+                },
+                error:function(){
+                    alert('网络请求失败！')
+                }
+            })
+            {#当用户点击加入购物车的时候发送ajax请求，往购物车中添加数据#}
+            $(".add_goods").click(function () {
+
+               var gid = $(this).prev().val()
+                {#alert(gid)#}
+
+                $.ajax({
+                    type: "get",
+                    url: '/add_'+gid+'_1',
+                    dataType: "json",
+
+                    success: function (dic) {
+                        alert(dic.result)
+                        counts = dic.count
+                        $('.goods_count').html(counts)
+                    },
+                    error: function () {
+                        alert('error')
+                    }
+
+                })
+
+               // $.get('/getajax_'+gid+'_1',function(dic){
+                  //  alert(dic.result)
+               // })
+
+            })
+        })
+    </script>
+{% endblock head %}
+
+{% block body %}
+	<div class="search_bar clearfix">
+		<a href="index.html" class="logo fl"><img src="/static/images/logo.png"></a>
+		<div class="search_con fl">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+		</div>
+		<div class="guest_cart fr">
+			<a href="#" class="cart_name fl">我的购物车</a>
+			<div class="goods_count fl">1</div>
+		</div>
+	</div>
+
+
+
+
+
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>	
+				<span></span>			
+				<ul class="subnav">
+					<li><a href="/list_1_1_1" class="fruit">新鲜水果</a></li>
+					<li><a href="/list_2_1_1" class="seafood">海鲜水产</a></li>
+					<li><a href="/list_3_1_1" class="meet">猪牛羊肉</a></li>
+					<li><a href="/list_4_1_1" class="egg">禽类蛋品</a></li>
+					<li><a href="/list_5_1_1" class="vegetables">新鲜蔬菜</a></li>
+					<li><a href="/list_6_1_1" class="ice">速冻食品</a></li>
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+
+
+	<div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		<a href="#">新鲜水果</a>
+	</div>
+
+
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+                    {% for good in newTwos %}
+					<li>
+						<a href="/detail_{{ good.id }}"><img src="/static/{{ good.gpic }}"></a>
+						<h4><a href="/detail_{{ good.id }}">{{ good.gtitle }}</a></h4>
+						<div class="prize">￥{{ good.gprice }}</div>
+					</li>
+				    {% endfor %}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<div class="sort_bar">
+
+				<a href="/list_{{ typeinfo.id }}_1_1"
+                    {% if sort == '1' %}
+                        class="active"
+                    {% endif %}>
+                    默认
+                </a>
+
+				<a href="/list_{{ typeinfo.id }}_2_1"
+                   {% if sort == '2' %}
+                       class="active"
+                   {% endif %}
+                >价格</a>
+				<a href="/list_{{ typeinfo.id }}_3_1"
+                   {% if sort == '3' %}
+                       class="active"
+                   {% endif %}
+                >人气</a>
+
+			</div>
+
+			<ul class="goods_type_list clearfix">
+                {% for good in page %}
+				<li>
+					<a href="/detail_{{ good.id }}"><img src="/static/{{ good.gpic }}"></a>
+					<h4><a href="detail.html">{{ good.gtitle }}</a></h4>
+					<div class="operate">
+						<span class="prize">￥{{ good.gprice }}</span>
+						<span class="unit">{{ good.gprice }}/{{ good.gunite }}g</span>
+
+                        <input type="hidden" value="{{ good.id }}" id="gid">
+
+						<a href="javascript:;"  class="add_goods" title="加入购物车"></a>
+					</div>
+				</li>
+                {% endfor %}
+			</ul>
+
+			<div class="pagenation">
+            {% if page.has_previous %}
+				<a href="/list_{{ typeinfo.id }}_{{ sort }}_{{ page.previous_page_number }}">上一页</a>
+            {% endif %}
+                {% for p in paginator.page_range %}
+
+				<a href="/list_{{ typeinfo.id }}_{{ sort }}_{{ p }}"
+                   {% if p == pindex %}
+                   class="active"
+                   {% endif %}
+                >{{ p }}</a>
+
+                {% endfor %}
+
+            {% if page.has_next %}
+				<a href="list_{{ typeinfo.id }}_{{ sort }}_{{ page.next_page_number }}">下一页></a>
+            {% endif %}
+
+			</div>
+		</div>
+	</div>
+
+
+{% endblock body %}
